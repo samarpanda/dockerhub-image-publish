@@ -1,0 +1,21 @@
+name: Publish alpine-demo image to dockerhub
+on:
+  [workflow_dispatch]
+
+jobs:
+  publish_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        users: actions/checkout@v2
+      - name: change directory and persist the directory change across multiple steps
+        working-directory: alpine-demo
+        run: |
+          ls -altr
+      -name: build
+        run: |
+          docker build -t samarpanda/alpine-demo:latest .
+      - name: publish
+        run: |
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          docker push samarpanda/alpine-demo:latest
