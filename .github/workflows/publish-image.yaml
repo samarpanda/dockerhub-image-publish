@@ -9,8 +9,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Build docker Image
+        working-directory: alpine-demo
         run: |
-          working-directory: alpine-demo
           pwd
           ls -altr
           docker build -t samarpanda/alpine-demo:latest -f Dockerfile .
