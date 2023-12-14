@@ -8,12 +8,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Change directory and persist the directory change across multiple steps
-        working-directory: alpine-demo
-        run: |
-          ls -altr
       - name: Build docker Image
         run: |
+          working-directory: alpine-demo
           pwd
           ls -altr
           docker build -t samarpanda/alpine-demo:latest -f Dockerfile .
