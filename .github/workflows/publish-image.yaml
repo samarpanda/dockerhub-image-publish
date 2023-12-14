@@ -6,16 +6,18 @@ jobs:
   publish_image:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
+      - name: Checkout code
         uses: actions/checkout@v3
-      - name: change directory and persist the directory change across multiple steps
+      - name: Change directory and persist the directory change across multiple steps
         working-directory: alpine-demo
         run: |
           ls -altr
-      - name: build
+      - name: Build docker Image
         run: |
+          pwd
+          ls -altr
           docker build -t samarpanda/alpine-demo:latest -f Dockerfile .
-      - name: publish
+      - name: Publish Docker Image
         run: |
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
           docker push samarpanda/alpine-demo:latest

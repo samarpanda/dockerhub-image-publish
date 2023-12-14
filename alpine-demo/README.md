@@ -3,8 +3,8 @@
 
 ## Build docker image
 
-1. Docker build `docker build -t <DOCKER_IMAGE_NAME> -f <DOCKERFILE_NAME>`
-1. Example command `docker build -t alpine-demo -f Dockerfile`
+1. Docker build `docker build -t <DOCKER_IMAGE_NAME> -f <DOCKERFILE_NAME> .`
+1. Example command `docker build -t alpine-demo -f Dockerfile .`
 
 ## Docker run & remove the container
 
