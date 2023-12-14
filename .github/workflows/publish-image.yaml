@@ -12,7 +12,7 @@ jobs:
         working-directory: alpine-demo
         run: |
           ls -altr
-      -name: build
+      - name: build
         run: |
           docker build -t samarpanda/alpine-demo:latest .
       - name: publish
