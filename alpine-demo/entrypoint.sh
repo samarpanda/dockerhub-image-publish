@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo "alpine-demo: hello from entrypoint.sh"
+echo "alpine-demo:1.0.0 from entrypoint.sh"

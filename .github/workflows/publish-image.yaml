@@ -12,9 +12,8 @@ jobs:
         working-directory: alpine-demo
         run: |
           pwd
-          ls -altr
-          docker build -t samarpanda/alpine-demo:latest -f Dockerfile .
+          docker build -t samarpanda/alpine-demo:1.0.0 -f Dockerfile .
       - name: Publish Docker Image
         run: |
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-          docker push samarpanda/alpine-demo:latest
+          docker push samarpanda/alpine-demo:1.0.0
