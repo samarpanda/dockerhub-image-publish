@@ -17,3 +17,4 @@ jobs:
         run: |
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
           docker push samarpanda/alpine-demo:1.0.0
+          docker push samarpanda/alpine-demo:latest
