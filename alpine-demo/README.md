@@ -1,22 +1,49 @@
-# Github action & dockerhub integration
-> Publish docker image to dockerhub using github actions
+## Alpine Bash Docker Image
 
-## Build docker image
+This Docker image, built upon Alpine 3.19.0, offers a streamlined environment equipped with Bash. Its lightweight nature makes it an ideal choice for effortlessly executing scripts.
 
-1. Docker build `docker build -t <DOCKER_IMAGE_NAME> -f <DOCKERFILE_NAME> .`
-1. Example command `docker build -t alpine-demo -f Dockerfile .`
+### Features:
 
-## Docker run & remove the container
+- **Efficient Script Execution:** Utilize the power of Bash within this minimalist Alpine-based Docker image to seamlessly run your scripts.
+- **Optimized Performance:** Engineered for efficiency and ease of use, this container provides a nimble platform for script execution.
+- **Alpine Base:** Leveraging Alpine Linux 3.19.0, this image maintains a small footprint, ensuring rapid deployment and resource efficiency.
 
-1. Docker run & remove `docker run --rm --name <DOCKER_IMAGE_NAME> <DOCKER_IMAGE_NAME>`
-1. Example command `docker run --rm --name alpine-demo alpine-demo`
+### Usage:
 
-## Docker run without removing the container
+Start using this image by pulling it from Docker Hub:
 
-1. Docker run `docker run -it --name <DOCKER_IMAGE_NAME> <DOCKER_IMAGE_NAME>`
-1. Example command `docker run -it --name alpine-demo alpine-demo`
+```bash
+docker pull samarpanda/alpine-demo:latest
+```
 
-## Docker remove the container & image
+Run a container based on this image & remove after the run:
 
-1. Docker run `docker stop <DOCKER_IMAGE_NAME>; docker rm -f <DOCKER_IMAGE_NAME>; docker image rm -f <DOCKER_IMAGE_NAME>;`
-1. Example command `docker stop alpine-demo; docker rm -f alpine-demo; docker image rm -f alpine-demo;`
+```bash
+docker run --rm -it samarpanda/alpine-demo:latest
+```
+
+Delete image from local:
+
+```bash
+docker image rm -f samarpanda/alpine-demo:latest
+```
+
+Docker image build command:
+```bash
+docker build -t samarpanda/alpine-demo:latest -f Dockerfile .
+```
+
+Feel free to customize the `entrypoint.sh` script or mount volumes as needed for your specific applications.
+
+## Supported tags and respective Dockerfile links
+
+- [samarpanda/alpine-demo:1.0.2](https://github.com/samarpanda/dockerhub-image-publish/blob/master/alpine-demo/Dockerfile)
+
+## Github source code folder reference
+
+- [samarpanda/alpine-demo:1.0.2](https://github.com/samarpanda/dockerhub-image-publish/tree/master/alpine-demo)
+
+## Where to file issues?
+
+[https://github.com/samarpanda/dockerhub-image-publish/issues](https://github.com/samarpanda/dockerhub-image-publish/issues)
+
