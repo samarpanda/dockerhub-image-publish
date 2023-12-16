@@ -37,11 +37,11 @@ Feel free to customize the `entrypoint.sh` script or mount volumes as needed for
 
 ## Supported tags and respective Dockerfile links
 
-- [samarpanda/alpine-demo:1.0.2](https://github.com/samarpanda/dockerhub-image-publish/blob/master/alpine-demo/Dockerfile)
+- [samarpanda/alpine-demo:1.0.3](https://github.com/samarpanda/dockerhub-image-publish/blob/master/alpine-demo/Dockerfile)
 
 ## Github source code folder reference
 
-- [samarpanda/alpine-demo:1.0.2](https://github.com/samarpanda/dockerhub-image-publish/tree/master/alpine-demo)
+- [samarpanda/alpine-demo:1.0.3](https://github.com/samarpanda/dockerhub-image-publish/tree/master/alpine-demo)
 
 ## Where to file issues?
 
