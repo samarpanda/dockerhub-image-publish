@@ -5,11 +5,12 @@ This repository contains docker images for various services & applications. Each
 ## Directory Structure
 
 - `/alpine-demo`: [Alpine bash docker image](https://github.com/samarpanda/dockerhub-image-publish/tree/master/alpine-demo)
-- `/node-pm2`: [TODO] bash, curl, nodejs & pm2 docker image
+- `/node-pm2`: [Node & pm2 docker image](https://github.com/samarpanda/dockerhub-image-publish/tree/master/node-pm2)
 
 ## Dockerhub repositories
 
 - [samarpanda/alpine-demo:1.0.3](https://hub.docker.com/r/samarpanda/alpine-demo)
+- [samarpanda/alpine-demo:0.0.1](https://hub.docker.com/r/samarpanda/node-pm2)
 
 ## Usage
 
