@@ -37,7 +37,7 @@ Example Dockerfile
 ```bash
 #!/bin/sh
 
-FROM node-pm2:latest AS base
+FROM samarpanda/node-pm2:latest AS base
 
 FROM base AS deps
 WORKDIR /app
@@ -76,7 +76,7 @@ Below is example init.sh using pm2
 ```bash
 #!/bin/sh
 
-export NODE_ENV=development
+export NODE_ENV=production
 
 APP_NAME=app
 WORKER=2
