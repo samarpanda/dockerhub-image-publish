@@ -10,7 +10,7 @@ This repository contains docker images for various services & applications. Each
 ## Dockerhub repositories
 
 - [samarpanda/alpine-demo:1.0.3](https://hub.docker.com/r/samarpanda/alpine-demo)
-- [samarpanda/alpine-demo:0.0.1](https://hub.docker.com/r/samarpanda/node-pm2)
+- [samarpanda/node-pm2:0.0.1](https://hub.docker.com/r/samarpanda/node-pm2)
 
 ## Usage
 
