@@ -22,7 +22,7 @@ jobs:
 
       - name: Log in to DockerHub
         run: |
-          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin --quiet
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Publish Docker Image ($DOCKER_IMAGE_TAG)
         run: |
@@ -31,3 +31,6 @@ jobs:
       - name: Publish Docker Image (latest)
         run: |
           docker push $DOCKER_IMAGE_NAME:latest
+
+      - name: Log out of Dockerhub
+        run: docker logout

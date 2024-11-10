@@ -31,3 +31,6 @@ jobs:
       - name: Publish Docker Image (latest)
         run: |
           docker push $DOCKER_IMAGE_NAME:latest
+
+      - name: Log out of Dockerhub
+        run: docker logout
