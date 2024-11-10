@@ -1,4 +1,4 @@
-name: Publish alpine-demo to dockerhub
+name: Publish node-pm2 to dockerhub
 on:
   [workflow_dispatch]
 
@@ -7,15 +7,15 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DOCKER_IMAGE_NAME: samarpanda/alpine-demo
-      DOCKER_IMAGE_TAG: 1.0.3
+      DOCKER_IMAGE_NAME: samarpanda/node-pm2
+      DOCKER_IMAGE_TAG: 20.18.0
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build the Docker Image
-        working-directory: alpine-demo
+        working-directory: node-pm2
         run: |
           pwd
           docker build -t $DOCKER_IMAGE_NAME:latest -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f Dockerfile .
