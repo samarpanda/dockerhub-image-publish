@@ -1,4 +1,4 @@
-name: Publish node-pm2 to dockerhub
+name: Publish v16-node-pm2 to dockerhub
 on:
   [workflow_dispatch]
 
