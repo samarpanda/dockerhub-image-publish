@@ -18,7 +18,7 @@ COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 RUN addgroup -S -g 10001 caddygroup && \
     adduser -S -D -u 10001 -G caddygroup caddyuser && \
     mkdir -p /data /config && \
-    chown -R caddyuser:caddygroup /data /config && \
+    chown -R caddyuser:caddygroup /data /config
 
 # Run as non-root
 USER caddyuser
