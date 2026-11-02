@@ -1,0 +1,50 @@
+
+name: Publish v2-caddy-cloudflare-dns to dockerhub
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish_image:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_IMAGE_NAME: samarpanda/caddy-cloudflare-dns
+      DOCKER_IMAGE_TAG: 2.11.7
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build the Docker Image
+        working-directory: caddy-cloudflare-dns/v2
+        run: |
+          docker build \
+            -t $DOCKER_IMAGE_NAME:latest \
+            -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG \
+            -f Dockerfile .
+
+      - name: Verify Cloudflare DNS Module
+        run: |
+          docker run --rm \
+            $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG \
+            caddy list-modules | grep dns.providers.cloudflare
+
+      - name: Log in to DockerHub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | \
+            docker login \
+              -u "${{ secrets.DOCKERHUB_USERNAME }}" \
+              --password-stdin
+
+      - name: Publish Docker Image (version)
+        run: |
+          docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+
+      - name: Publish Docker Image (latest)
+        run: |
+          docker push $DOCKER_IMAGE_NAME:latest
+
+      - name: Log out of DockerHub
+        if: always()
+        run: docker logout
