@@ -1,5 +1,5 @@
 # Stage 1: Build the custom Caddy binary with the Cloudflare DNS module
-FROM caddy:builder AS builder
+FROM caddy:2.11.7-builder-alpine AS builder
 
 RUN xcaddy build \
     --with github.com/caddy-dns/cloudflare
