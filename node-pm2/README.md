@@ -1,106 +1,146 @@
-# Node.js DevOps Image: PM2, Bash, and Curl Ready
-> Nodejs devops image with essentials bash, curl & pm2 for containers
+# Node.js with PM2
 
-This Docker image is tailored for Node.js developers, equipped with essential tools like Node.js, PM2 process manager, Bash, and Curl. It streamlines the creation of new images by providing a comprehensive environment, allowing seamless development, testing, and deployment of Node.js applications. Ideal for building scalable and efficient containerized Node.js applications, this image simplifies workflows and empowers developers to craft robust solutions effortlessly.
+Alpine-based Node.js images with PM2, Bash, Curl, and `libc6-compat`. Use them as a base for application images that run with `pm2-runtime`.
 
-[hub.docker.com/r/samarpanda/node-pm2](https://hub.docker.com/r/samarpanda/node-pm2)
+[Docker Hub](https://hub.docker.com/r/samarpanda/node-pm2) · [Repository overview](../README.md)
 
-## Features:
+## Image versions
 
-1. **Node.js Environment:**  
-   - Includes Node.js for seamless execution and management of Node.js applications.
+These tags are configured in this repository's Dockerfiles and publishing workflows. All variants install PM2 `5.4.2`.
 
-2. **PM2 Process Manager:**  
-   - Facilitates production-grade process management for Node.js apps.
-   - Ensures uptime, scaling, and robust monitoring capabilities.
+| Image tag | Node.js base image | Dockerfile |
+| --- | --- | --- |
+| `20.18.0` | `node:20.18.0-alpine` | [v20/Dockerfile](v20/Dockerfile) |
+| `18.20.4` | `node:18.20.4-alpine` | [v18/Dockerfile](v18/Dockerfile) |
+| `16.20.2` | `node:16.20.2-alpine` | [v16/Dockerfile](v16/Dockerfile) |
+| `14.21.3` | `node:14.21.3-alpine` | [v14/Dockerfile](v14/Dockerfile) |
 
-3. **Bash Shell:**  
-   - Offers a flexible command-line interface for executing scripts and commands.
+The Node 20 publishing workflow also updates `latest`; the other Node workflows publish only their version tags. Pin a version in your application Dockerfile to avoid unexpected changes when `latest` moves.
 
-4. **Curl Utility:**  
-   - Enables performing HTTP requests and interacting with APIs for testing and integration.
+As of November 2026, all Node.js release lines listed here have reached end of life. See the [Node.js release schedule](https://github.com/nodejs/Release#release-schedule). These images document the existing builds; upgrade the base images to a supported Node.js release before adopting them for a new production deployment.
 
-5. **Streamlined Image Creation:**  
-   - Bundles necessary tools, eliminating dependency installation for quick container setup.
+## What the base image provides
 
-6. **Enhanced Development Workflow:**  
-   - Provides a comprehensive environment for coding, testing, and deployment.
+- PM2 installed globally under `/node/.npm-global`, with its executables on `PATH`.
+- Bash, Curl, and `libc6-compat` installed through Alpine's package manager.
+- Working directory `/node`.
 
-7. **Scalability and Robustness:**  
-   - PM2 ensures scalability, efficient monitoring, and handling of application crashes.
+The Dockerfiles do not select a non-root user or configure an application startup command. Set both in your application image. They also declare `NPM_VERSION` as an environment variable without installing that npm version; use `npm --version` to check the actual installed version.
 
-This Docker image simplifies Node.js development within containers, offering a standardized environment for efficient workflow and application deployment.
+## Build an application image
 
-### Usage:
+This example assumes an npm application with `package.json`, `package-lock.json`, and an entry point named `server.js`. It installs production dependencies only and does not run a compilation step. Applications that need TypeScript compilation or another build step should build with development dependencies in a separate stage and copy the generated output into the runtime image.
 
-Example Dockerfile
-```bash
-#!/bin/sh
+Create this `Dockerfile` in your application's directory:
 
-FROM samarpanda/node-pm2:latest AS base
+```dockerfile
+FROM samarpanda/node-pm2:20.18.0
 
-FROM base AS deps
-WORKDIR /app
-RUN echo "registry=https://registry.npmjs.org" > .npmrc
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci --only=production; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile --prod; \
-  else echo "No lock file found. Please add lock file. Failling the build & Exit." && exit 1; \
-  fi
-
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-FROM base AS runner
-ENV NODE_ENV production
+ENV NODE_ENV=production
+ENV PM2_HOME=/home/node/.pm2
 WORKDIR /app
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nodejs
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
-USER root
-RUN mkdir /var/log/app && chown -R nodejs:nodejs /var/log/app
-USER nodejs
-COPY --from=builder /app .
+COPY --chown=node:node . .
+RUN mkdir -p /home/node/.pm2 /app/storage \
+    && chown -R node:node /home/node/.pm2 /app/storage
 
-CMD [ "sh", "init.sh" ]
+USER node
+EXPOSE 3000
+CMD ["pm2-runtime", "start", "server.js", "--name", "app"]
 ```
 
-Below is example init.sh using pm2
+The inherited `node` user runs the application. Its PM2 state directory and the example application's `/app/storage` directory are writable. Change the entry point and port to match your application, and make the server listen on `0.0.0.0` so it can receive traffic through Docker's published port.
 
-```bash
-#!/bin/sh
+Add a `.dockerignore` beside the Dockerfile:
 
-export NODE_ENV=production
-
-APP_NAME=app
-WORKER=2
-pm2-runtime start server.js --name $APP_NAME --instances $WORKER
+```text
+node_modules
+.git
+.env
+.env.*
+npm-debug.log*
+storage
 ```
 
-Feel free to use this in various deployments around Nodejs applications
+Build and start the application:
 
-## Quick commands used to build the docker image
+```bash
+docker build -t my-node-app:local .
+docker run -d --name node-app --restart unless-stopped -p 3000:3000 my-node-app:local
+docker logs --tail=100 -f node-app
+```
 
-1. `docker build -t node-pm2:latest -f Dockerfile .`
-1. `docker run --rm -it samarpanda/node-pm2:latest`
-1. `docker image rm -f samarpanda/node-pm2:latest`
+[PM2 recommends `pm2-runtime` for containers](https://pm2.keymetrics.io/docs/usage/docker-pm2-nodejs/). It keeps the application in the foreground and forwards shutdown signals. If you use a startup script, end it with `exec pm2-runtime start server.js --name app` so the shell hands control to PM2.
 
+Stop and remove the application container:
 
-## Supported tags and respective Dockerfile links
+```bash
+docker stop node-app
+docker rm node-app
+```
 
-- [samarpanda/node-pm2:0.0.1](https://github.com/samarpanda/dockerhub-image-publish/blob/master/alpine-demo/Dockerfile)
+## Persistent storage and permissions
 
-## Github source code folder reference
+Only mount directories your application actually needs to persist. A host mount replaces the image directory, so the Dockerfile's ownership does not apply to that host folder.
 
-- [samarpanda/node-pm2:0.0.1](https://github.com/samarpanda/dockerhub-image-publish/tree/master/alpine-demo)
+For standard Linux Docker without rootless mode or user namespace remapping, first check the application's runtime identity:
 
-## Where to file issues?
+```bash
+docker run --rm my-node-app:local id
+```
 
-[https://github.com/samarpanda/dockerhub-image-publish/issues](https://github.com/samarpanda/dockerhub-image-publish/issues)
+For the example image, expect the inherited `node` user with UID/GID `1000:1000`. If your image reports different numbers, use those numbers below.
 
+Create a dedicated host directory before starting a container with the mount:
+
+```bash
+mkdir -p app_storage
+sudo chown 1000:1000 app_storage
+sudo chmod 700 app_storage
+```
+
+Check actual write access as the application's default user:
+
+```bash
+docker run --rm \
+  --mount type=bind,src="$(pwd)/app_storage",dst=/app/storage \
+  my-node-app:local sh -ec '
+    probe=$(mktemp /app/storage/.write-check.XXXXXX)
+    rm "$probe"
+    echo "Application storage is writable."
+  '
+```
+
+After that succeeds, add the same `--mount` option to the application start command. The `--mount` syntax fails if the source folder is missing instead of creating one implicitly.
+
+For existing storage, stop every container writing to it, then repair only that dedicated directory:
+
+```bash
+sudo chown -R 1000:1000 app_storage
+sudo chmod -R u+rwX,go-rwx app_storage
+```
+
+Do not use `chmod 777`. Your host account may need `sudo` to inspect the private storage afterward. Docker Desktop, rootless Docker, user namespace remapping, and SELinux can require different host ownership or labeling; verify access with the container write check rather than relying on host permissions alone.
+
+## Build the base image locally
+
+From the repository root:
+
+```bash
+docker build -t node-pm2:local ./node-pm2/v20
+docker run --rm node-pm2:local node --version
+docker run --rm node-pm2:local npm --version
+docker run --rm node-pm2:local pm2 --version
+docker run --rm -it node-pm2:local bash
+```
+
+Replace `v20` with `v18`, `v16`, or `v14` to build another variant. To use your local build in the application example, change its `FROM` line to `FROM node-pm2:local`.
+
+## Publishing and issues
+
+See the [root README](../README.md#publishing-to-docker-hub) for GitHub Actions publishing instructions.
+
+Report issues in [the GitHub issue tracker](https://github.com/samarpanda/dockerhub-image-publish/issues). Include the image tag, application startup command, and relevant logs without credentials.
