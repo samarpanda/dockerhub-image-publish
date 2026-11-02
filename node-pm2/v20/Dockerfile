@@ -11,7 +11,12 @@ RUN apk update && apk add --no-cache libc6-compat bash curl
 WORKDIR /node
 ENV NPM_CONFIG_PREFIX=/node/.npm-global
 ENV PATH=$PATH:/node/.npm-global/bin
-RUN npm install pm2@5.4.2 -g --only=production
+
+# Install PM2 without executing dependency lifecycle scripts
+RUN npm install -g "pm2@${PM2_VERSION}" \
+    --omit=dev \
+    --ignore-scripts \
+    && pm2 --version
 
 #WORKDIR /app
 #RUN echo "registry=https://registry.npmjs.org" > .npmrc
