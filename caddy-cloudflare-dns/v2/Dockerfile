@@ -19,7 +19,6 @@ RUN addgroup -S -g 10001 caddygroup && \
     adduser -S -D -u 10001 -G caddygroup caddyuser && \
     mkdir -p /data /config && \
     chown -R caddyuser:caddygroup /data /config && \
-    setcap cap_net_bind_service=+ep /usr/bin/caddy
 
 # Run as non-root
 USER caddyuser
